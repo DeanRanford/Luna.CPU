@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 public partial class CPU(IMemory memory) : ICPU
 {
-    public int Pointer { get; set; }
+    public int LinePointer { get; set; }
     public IMemory Memory { get; set; } = memory;
     public List<Instruction> Instructions { get; set; } = [];
     public List<IDefinition> Definitions { get; set; } = [];
@@ -21,7 +21,7 @@ public partial class CPU(IMemory memory) : ICPU
 
     private string ProcessComments(string line)
     {
-        var commentIndex = line.IndexOf(this.Commenter);
+        var commentIndex = line.IndexOf(this.Commenter, StringComparison.CurrentCulture);
         if (commentIndex != -1)
         {
             line = line[..commentIndex].TrimEnd();
@@ -84,8 +84,8 @@ public partial class CPU(IMemory memory) : ICPU
     public bool GetParameter(string element, out Parameter parameter)
     {
         parameter = this.DummyParameter;
-        var location = element.StartsWith("#");
-        var indirect = element.StartsWith(">");
+        var location = element.StartsWith("#", StringComparison.CurrentCulture);
+        var indirect = element.StartsWith(">", StringComparison.CurrentCulture);
         element = element.Replace("#", "").Replace(">", "");
         if (!MyRegex().IsMatch(element))
         {
@@ -105,7 +105,7 @@ public partial class CPU(IMemory memory) : ICPU
         return true;
     }
 
-    public void SetPointer(int value) => this.Pointer = value;
+    public void SetPointer(int value) => this.LinePointer = value;
 
     public ParseResult Parse(string[] code)
     {
@@ -157,19 +157,19 @@ public partial class CPU(IMemory memory) : ICPU
 
     public StepResult Step()
     {
-        if (this.Pointer < 0 || this.Pointer >= this.Instructions.Count)
+        if (this.LinePointer < 0 || this.LinePointer >= this.Instructions.Count)
         {
-            return new StepResult(false, StepResultComment.ENDOFCODE, this.Pointer);
+            return new StepResult(false, StepResultComment.ENDOFCODE, this.LinePointer);
         }
 
-        var instruction = this.Instructions[this.Pointer];
+        var instruction = this.Instructions[this.LinePointer];
         var result = instruction.Definition.Func(this, instruction);
         if (!result)
         {
-            return new StepResult(false, StepResultComment.NOINSTRUCTION, this.Pointer);
+            return new StepResult(false, StepResultComment.NOINSTRUCTION, this.LinePointer);
         }
-        this.Pointer++;
-        return new StepResult(true, StepResultComment.OK, this.Pointer);
+        this.LinePointer++;
+        return new StepResult(true, StepResultComment.OK, this.LinePointer);
     }
 
     [GeneratedRegex(@"^-?\d+$")]
