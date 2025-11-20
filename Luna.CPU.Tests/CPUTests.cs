@@ -1,6 +1,6 @@
-using Luna.CPU;
-
 namespace Luna.CPU.Tests;
+
+using Luna.CPU;
 
 [TestClass]
 public class CPUTests
@@ -50,12 +50,16 @@ public class CPUTests
     public void CPUAdd()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        var result = cpu.Parse(new string[] { "LBL 0", "ADD #1 1", "JMP 0" });
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        var result = cpu.Parse(["LBL 0", "ADD #1 1", "JMP 0"]);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ParseResultComment.OK, result.Comment);
         Assert.AreEqual(3, result.Line);
-        for (int i = 0; i <= 4; i++) Assert.IsTrue(cpu.Step().Success);
+        for (var i = 0; i <= 4; i++)
+        {
+            Assert.IsTrue(cpu.Step().Success);
+        }
+
         Assert.IsTrue(cpu.Memory.GetAt(1, out var value));
         Assert.AreEqual(2, value);
     }
@@ -64,9 +68,9 @@ public class CPUTests
     public void CPUNoCode()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
         var result = cpu.Step();
-        Assert.AreEqual(StepResultComment.END_OF_CODE, result.Comment);
+        Assert.AreEqual(StepResultComment.ENDOFCODE, result.Comment);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(0, result.Line);
     }
@@ -75,9 +79,9 @@ public class CPUTests
     public void CPUNoCodeParsed()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        var result = cpu.Parse(Array.Empty<string>());
-        Assert.AreEqual(ParseResultComment.NO_CODE, result.Comment);
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        var result = cpu.Parse([]);
+        Assert.AreEqual(ParseResultComment.NOCODE, result.Comment);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(0, result.Line);
     }
@@ -86,12 +90,12 @@ public class CPUTests
     public void CPUPointerOutOfCode()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL() });
-        Assert.AreEqual(true, cpu.Parse(new string[] { "LBL 0" }).Success);
+        cpu.Definitions.AddRange([new LBL()]);
+        Assert.AreEqual(true, cpu.Parse(["LBL 0"]).Success);
         cpu.Step();
         var result = cpu.Step();
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(StepResultComment.END_OF_CODE, result.Comment);
+        Assert.AreEqual(StepResultComment.ENDOFCODE, result.Comment);
         Assert.AreEqual(1, result.Line);
     }
 
@@ -99,9 +103,13 @@ public class CPUTests
     public void CPUBasicAdd1()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        cpu.Parse(new string[] { "ADD #0 1", "ADD #0 #0", "ADD >0 101" });
-        for (int i = 0; i <= 2; i++) Assert.IsTrue(cpu.Step().Success);
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        cpu.Parse(["ADD #0 1", "ADD #0 #0", "ADD >0 101"]);
+        for (var i = 0; i <= 2; i++)
+        {
+            Assert.IsTrue(cpu.Step().Success);
+        }
+
         Assert.IsTrue(cpu.Memory.GetAt(0, out var value1));
         Assert.AreEqual(2, value1);
         Assert.IsTrue(cpu.Memory.GetAt(2, out var value2));
@@ -112,9 +120,13 @@ public class CPUTests
     public void CPUBasicAdd2()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        cpu.Parse(new string[] { "ADD #0 1", "ADD #0 #0", "ADD >0 101" });
-        for (int i = 0; i <= 2; i++) Assert.IsTrue(cpu.Step().Success);
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        cpu.Parse(["ADD #0 1", "ADD #0 #0", "ADD >0 101"]);
+        for (var i = 0; i <= 2; i++)
+        {
+            Assert.IsTrue(cpu.Step().Success);
+        }
+
         Assert.IsTrue(cpu.Memory.GetAt(0, out var value1));
         Assert.AreEqual(2, value1);
         Assert.IsTrue(cpu.Memory.GetAt(2, out var value2));
@@ -125,9 +137,13 @@ public class CPUTests
     public void CPUBasicAdd3()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        cpu.Parse(new string[] { "ADD #0 1", "ADD #1 1", "ADD #3 #0", "ADD #3 #1" });
-        for (int i = 0; i <= 3; i++) Assert.IsTrue(cpu.Step().Success);
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        cpu.Parse(["ADD #0 1", "ADD #1 1", "ADD #3 #0", "ADD #3 #1"]);
+        for (var i = 0; i <= 3; i++)
+        {
+            Assert.IsTrue(cpu.Step().Success);
+        }
+
         Assert.IsTrue(cpu.Memory.GetAt(3, out var value));
         Assert.AreEqual(2, value);
     }
@@ -136,9 +152,13 @@ public class CPUTests
     public void CPUBasicAdd4()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        cpu.Parse(new string[] { "ADD #0 1", "ADD >0 2", "ADD #3 >0" });
-        for (int i = 0; i <= 2; i++) Assert.IsTrue(cpu.Step().Success);
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        cpu.Parse(["ADD #0 1", "ADD >0 2", "ADD #3 >0"]);
+        for (var i = 0; i <= 2; i++)
+        {
+            Assert.IsTrue(cpu.Step().Success);
+        }
+
         Assert.IsTrue(cpu.Memory.GetAt(3, out var value));
         Assert.AreEqual(2, value);
     }
@@ -147,9 +167,13 @@ public class CPUTests
     public void CPUBasicAdd5()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        cpu.Parse(new string[] { "ADD #2 0", "ADD #0 101", "ADD #1 >2" });
-        for (int i = 0; i <= 2; i++) Assert.IsTrue(cpu.Step().Success);
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        cpu.Parse(["ADD #2 0", "ADD #0 101", "ADD #1 >2"]);
+        for (var i = 0; i <= 2; i++)
+        {
+            Assert.IsTrue(cpu.Step().Success);
+        }
+
         Assert.IsTrue(cpu.Memory.GetAt(1, out var value));
         Assert.AreEqual(101, value);
     }
@@ -158,9 +182,13 @@ public class CPUTests
     public void CPUBasicAddSplit()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
         cpu.Parse("ADD #0 1\nADD #0 #0\nADD >0 101".Split("\n"));
-        for (int i = 0; i <= 2; i++) Assert.IsTrue(cpu.Step().Success);
+        for (var i = 0; i <= 2; i++)
+        {
+            Assert.IsTrue(cpu.Step().Success);
+        }
+
         Assert.IsTrue(cpu.Memory.GetAt(0, out var value1));
         Assert.AreEqual(2, value1);
         Assert.IsTrue(cpu.Memory.GetAt(2, out var value2));
@@ -171,9 +199,13 @@ public class CPUTests
     public void CPUBasicAddComment()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        cpu.Parse(new string[] { "--test", " --test", "--test ADD #0 1", "ADD #2 0  --test  ", "ADD #0 101", "ADD #1 >2" });
-        for (int i = 0; i <= 2; i++) Assert.IsTrue(cpu.Step().Success);
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        cpu.Parse(["--test", " --test", "--test ADD #0 1", "ADD #2 0  --test  ", "ADD #0 101", "ADD #1 >2"]);
+        for (var i = 0; i <= 2; i++)
+        {
+            Assert.IsTrue(cpu.Step().Success);
+        }
+
         Assert.IsTrue(cpu.Memory.GetAt(1, out var value));
         Assert.AreEqual(101, value);
         Assert.AreEqual(3, cpu.Instructions.Count);
@@ -183,9 +215,13 @@ public class CPUTests
     public void CPUBasicAddFormatting()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        cpu.Parse(new string[] { "  ADD #2 0", "ADD   #0 101", "ADD #1   >2" });
-        for (int i = 0; i <= 2; i++) Assert.IsTrue(cpu.Step().Success);
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        cpu.Parse(["  ADD #2 0", "ADD   #0 101", "ADD #1   >2"]);
+        for (var i = 0; i <= 2; i++)
+        {
+            Assert.IsTrue(cpu.Step().Success);
+        }
+
         Assert.IsTrue(cpu.Memory.GetAt(1, out var value));
         Assert.AreEqual(101, value);
         Assert.AreEqual(3, cpu.Instructions.Count);
@@ -195,60 +231,60 @@ public class CPUTests
     public void CPUBasicAddInvalid1()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        var result = cpu.Parse(new string[] { "ADD #2 0 ADD #0 101", "ADD #1 >2" });
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        var result = cpu.Parse(["ADD #2 0 ADD #0 101", "ADD #1 >2"]);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ParseResultComment.INVALID_PARAMETERS, result.Comment);
+        Assert.AreEqual(ParseResultComment.INVALIDPARAMETERS, result.Comment);
     }
 
     [TestMethod]
     public void CPUBasicAddInvalid2()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        var result = cpu.Parse(new string[] { "ADD #2 0 1", "ADD #0 101", "ADD #1 >2" });
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        var result = cpu.Parse(["ADD #2 0 1", "ADD #0 101", "ADD #1 >2"]);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ParseResultComment.INVALID_PARAMETERS, result.Comment);
+        Assert.AreEqual(ParseResultComment.INVALIDPARAMETERS, result.Comment);
     }
 
     [TestMethod]
     public void CPUBasicAddInvalidDecimal1()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        var result = cpu.Parse(new string[] { "ADD #2 0.0", "ADD #0 101", "ADD #1 >2" });
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        var result = cpu.Parse(["ADD #2 0.0", "ADD #0 101", "ADD #1 >2"]);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ParseResultComment.INVALID_PARAMETER, result.Comment);
+        Assert.AreEqual(ParseResultComment.INVALIDPARAMETER, result.Comment);
     }
 
     [TestMethod]
     public void CPUBasicAddInvalidDecimal2()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        var result = cpu.Parse(new string[] { "ADD #2.0 0", "ADD #0 101", "ADD #1 >2" });
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        var result = cpu.Parse(["ADD #2.0 0", "ADD #0 101", "ADD #1 >2"]);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ParseResultComment.INVALID_PARAMETER, result.Comment);
+        Assert.AreEqual(ParseResultComment.INVALIDPARAMETER, result.Comment);
     }
 
     [TestMethod]
     public void CPUBasicAddInvalidDecimal3()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        var result = cpu.Parse(new string[] { "ADD #2 1z", "ADD #0 101", "ADD #1 >2" });
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        var result = cpu.Parse(["ADD #2 1z", "ADD #0 101", "ADD #1 >2"]);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ParseResultComment.INVALID_PARAMETER, result.Comment);
+        Assert.AreEqual(ParseResultComment.INVALIDPARAMETER, result.Comment);
     }
 
     [TestMethod]
     public void CPUBasicAddEmpty1()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        var result = cpu.Parse(new string[] { "" });
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        var result = cpu.Parse([""]);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ParseResultComment.NO_CODE, result.Comment);
+        Assert.AreEqual(ParseResultComment.NOCODE, result.Comment);
         Assert.AreEqual(0, cpu.Instructions.Count);
     }
 
@@ -256,10 +292,10 @@ public class CPUTests
     public void CPUBasicAddEmpty2()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        var result = cpu.Parse(Array.Empty<string>());
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        var result = cpu.Parse([]);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ParseResultComment.NO_CODE, result.Comment);
+        Assert.AreEqual(ParseResultComment.NOCODE, result.Comment);
         Assert.AreEqual(0, cpu.Instructions.Count);
     }
 
@@ -267,10 +303,10 @@ public class CPUTests
     public void CPUBasicAddEmptyMulti()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        var result = cpu.Parse(new string[] { "", "" });
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        var result = cpu.Parse(["", ""]);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ParseResultComment.NO_CODE, result.Comment);
+        Assert.AreEqual(ParseResultComment.NOCODE, result.Comment);
         Assert.AreEqual(0, cpu.Instructions.Count);
     }
 
@@ -278,10 +314,10 @@ public class CPUTests
     public void CPUBasicAddSpace()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        var result = cpu.Parse(new string[] { " " });
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        var result = cpu.Parse([" "]);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ParseResultComment.NO_CODE, result.Comment);
+        Assert.AreEqual(ParseResultComment.NOCODE, result.Comment);
         Assert.AreEqual(0, cpu.Instructions.Count);
     }
 
@@ -290,10 +326,10 @@ public class CPUTests
     public void CPUBasicAddSpaceMulti()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        var result = cpu.Parse(new string[] { " ", " " });
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        var result = cpu.Parse([" ", " "]);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ParseResultComment.NO_CODE, result.Comment);
+        Assert.AreEqual(ParseResultComment.NOCODE, result.Comment);
         Assert.AreEqual(0, cpu.Instructions.Count);
     }
 
@@ -301,10 +337,10 @@ public class CPUTests
     public void CPUBasicAddMix1()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        var result = cpu.Parse(new string[] { "", " ", " " });
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        var result = cpu.Parse(["", " ", " "]);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ParseResultComment.NO_CODE, result.Comment);
+        Assert.AreEqual(ParseResultComment.NOCODE, result.Comment);
         Assert.AreEqual(0, cpu.Instructions.Count);
     }
 
@@ -312,10 +348,10 @@ public class CPUTests
     public void CPUBasicAddMix2()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        var result = cpu.Parse(new string[] { " ", "", " " });
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        var result = cpu.Parse([" ", "", " "]);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ParseResultComment.NO_CODE, result.Comment);
+        Assert.AreEqual(ParseResultComment.NOCODE, result.Comment);
         Assert.AreEqual(0, cpu.Instructions.Count);
     }
 
@@ -323,20 +359,24 @@ public class CPUTests
     public void CPUBasicJmpInvalid()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        cpu.Parse(new string[] { "JMP 0" });
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        cpu.Parse(["JMP 0"]);
         var result = cpu.Step();
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(StepResultComment.NO_INSTRUCTION, result.Comment);
+        Assert.AreEqual(StepResultComment.NOINSTRUCTION, result.Comment);
     }
 
     [TestMethod]
     public void CPUBasicAddJmp()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JMP() });
-        cpu.Parse(new string[] { "LBL 0", "ADD #1 1", "JMP 0" });
-        for (int i = 0; i <= 3; i++) Assert.IsTrue(cpu.Step().Success);
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JMP()]);
+        cpu.Parse(["LBL 0", "ADD #1 1", "JMP 0"]);
+        for (var i = 0; i <= 3; i++)
+        {
+            Assert.IsTrue(cpu.Step().Success);
+        }
+
         Assert.IsTrue(cpu.Memory.GetAt(1, out var value));
         Assert.AreEqual(2, value);
     }
@@ -345,9 +385,13 @@ public class CPUTests
     public void CPUBasicAddJez()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JEZ() });
-        cpu.Parse(new string[] { "LBL 0", "ADD #1 1", "JEZ #0 0" });
-        for (int i = 0; i <= 4; i++) Assert.IsTrue(cpu.Step().Success);
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JEZ()]);
+        cpu.Parse(["LBL 0", "ADD #1 1", "JEZ #0 0"]);
+        for (var i = 0; i <= 4; i++)
+        {
+            Assert.IsTrue(cpu.Step().Success);
+        }
+
         Assert.IsTrue(cpu.Memory.GetAt(1, out var value));
         Assert.AreEqual(2, value);
     }
@@ -356,9 +400,13 @@ public class CPUTests
     public void CPUBasicAddJlz()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new JLZ() });
-        cpu.Parse(new string[] { "ADD #0 -1", "LBL 0", "ADD #1 1", "JLZ #0 0", });
-        for (int i = 0; i <= 5; i++) Assert.IsTrue(cpu.Step().Success);
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new JLZ()]);
+        cpu.Parse(["ADD #0 -1", "LBL 0", "ADD #1 1", "JLZ #0 0",]);
+        for (var i = 0; i <= 5; i++)
+        {
+            Assert.IsTrue(cpu.Step().Success);
+        }
+
         Assert.IsTrue(cpu.Memory.GetAt(1, out var value));
         Assert.AreEqual(2, value);
     }
@@ -367,8 +415,8 @@ public class CPUTests
     public void CPUBasicAddInvalid3()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new ADD() });
-        var result = cpu.Parse(new string[] { "ADD 0 1" });
+        cpu.Definitions.AddRange([new ADD()]);
+        var result = cpu.Parse(["ADD 0 1"]);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(0, cpu.Instructions.Count);
     }
@@ -377,8 +425,8 @@ public class CPUTests
     public void CPUBasicAddInvalid4()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new ADD() });
-        var result = cpu.Parse(new string[] { "ADD #0 1 1" });
+        cpu.Definitions.AddRange([new ADD()]);
+        var result = cpu.Parse(["ADD #0 1 1"]);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(0, cpu.Instructions.Count);
     }
@@ -387,28 +435,28 @@ public class CPUTests
     public void CPUIncorrectMemoryParameter()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL() });
-        var result = cpu.Parse(new string[] { "LBL #0" });
+        cpu.Definitions.AddRange([new LBL()]);
+        var result = cpu.Parse(["LBL #0"]);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ParseResultComment.INVALID_PARAMETER, result.Comment);
+        Assert.AreEqual(ParseResultComment.INVALIDPARAMETER, result.Comment);
     }
 
     [TestMethod]
     public void CPUIncorrectIndirectParameter()
     {
         var cpu = new CPU(new Memory(16));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL() });
-        var result = cpu.Parse(new string[] { "LBL >0" });
+        cpu.Definitions.AddRange([new LBL()]);
+        var result = cpu.Parse(["LBL >0"]);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ParseResultComment.INVALID_PARAMETER, result.Comment);
+        Assert.AreEqual(ParseResultComment.INVALIDPARAMETER, result.Comment);
     }
 
     [TestMethod]
     public void CPUFib()
     {
         var cpu = new CPU(new Memory(32));
-        cpu.Definitions.AddRange(new IDefinition[] { new LBL(), new ADD(), new SUB(), new JMP(), new SET(), new JLZ() });
-        cpu.Parse(new string[] {
+        cpu.Definitions.AddRange([new LBL(), new ADD(), new SUB(), new JMP(), new SET(), new JLZ()]);
+        cpu.Parse([
             "--comment",
             "SET #0 24",
             "SET #2 5",
@@ -423,8 +471,8 @@ public class CPUTests
             "SUB #0 1",
             "JLZ #0 1",
             "JMP 0",
-            "LBL 1" });
-        for (int i = 0; i < 201; i++)
+            "LBL 1" ]);
+        for (var i = 0; i < 201; i++)
         {
             var result = cpu.Step();
             Assert.IsTrue(result.Success);

@@ -1,7 +1,8 @@
 namespace Luna.CPU;
+
 public interface IDefinition
 {
-    string Token { get; }
-    List<ParameterConstraint> ParameterConstraints { get; }
-    Func<ICPU, Instruction, bool> Func { get; }
+    public string Token { get; }
+    public List<ParameterConstraint> ParameterConstraints { get; }
+    public Func<ICPU, Instruction, bool> Func { get; }
 }

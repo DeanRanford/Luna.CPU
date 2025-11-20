@@ -1,55 +1,39 @@
-﻿namespace Luna.CPU;
+namespace Luna.CPU;
 
 public enum ParseResultComment
 {
     OK,
     ERROR,
-    NO_CODE,
-    INVALID_INSTRUCTION,
-    INVALID_PARAMETERS,
-    INVALID_PARAMETER
+    NOCODE,
+    INVALIDINSTRUCTION,
+    INVALIDPARAMETERS,
+    INVALIDPARAMETER
 }
 
 public enum StepResultComment
 {
     OK,
     ERROR,
-    END_OF_CODE,
-    NO_INSTRUCTION
+    ENDOFCODE,
+    NOINSTRUCTION
 }
 
-public abstract class Result
+public abstract class Result(bool success, int line)
 {
-    public bool Success { get; set; }
+    public bool Success { get; set; } = success;
 
-    public int Line { get; set; }
-
-    public Result(bool success, int line)
-    {
-        Success = success;
-
-        Line = line;
-    }
-
+    public int Line { get; set; } = line;
 }
 
-public class ParseResult : Result
+public class ParseResult(bool success, ParseResultComment comment, int line) : Result(success, line)
 {
 
-    public ParseResultComment Comment { get; set; }
-    public ParseResult(bool success, ParseResultComment comment, int line) : base(success, line)
-    {
-        Comment = comment;
-    }
+    public ParseResultComment Comment { get; set; } = comment;
 }
 
-public class StepResult : Result
+public class StepResult(bool success, StepResultComment comment, int line) : Result(success, line)
 {
 
-    public StepResultComment Comment { get; set; }
-    public StepResult(bool success, StepResultComment comment, int line) : base(success, line)
-    {
-        Comment = comment;
-    }
+    public StepResultComment Comment { get; set; } = comment;
 }
 

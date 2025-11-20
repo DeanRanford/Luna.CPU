@@ -14,15 +14,9 @@ public enum ParameterConstraint
     ConstantOrMemory
 }
 
-public class Parameter
+public class Parameter(ParameterType type, int value)
 {
 
-    public ParameterType Type { get; set; }
-    public int Value { get; set; }
-
-    public Parameter(ParameterType type, int value)
-    {
-        Type = type;
-        Value = value;
-    }
+    public ParameterType Type { get; set; } = type;
+    public int Value { get; set; } = value;
 }

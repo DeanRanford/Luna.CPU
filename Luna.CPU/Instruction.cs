@@ -1,13 +1,7 @@
 namespace Luna.CPU;
 
-public class Instruction
+public class Instruction(IDefinition definition, List<Parameter> parameters)
 {
-    public IDefinition Definition { get; set; }
-    public List<Parameter> Parameters = new List<Parameter>();
-
-    public Instruction(IDefinition definition, List<Parameter> parameters)
-    {
-        Definition = definition;
-        Parameters = parameters;
-    }
+    public IDefinition Definition { get; set; } = definition;
+    public List<Parameter> Parameters = parameters;
 }
